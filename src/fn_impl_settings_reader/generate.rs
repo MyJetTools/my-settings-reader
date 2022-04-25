@@ -14,7 +14,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let file_name = ".text";
 
     let implementation = format!(
-        r#"""pub async fn load() -> Self {{
+        r#"pub async fn load() -> Self {{
         if let Some(result) = Self::read_from_file() {{
             return result;
         }}
@@ -51,7 +51,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
         serde_yaml::from_slice(body).unwrap()
     }}
-    """#,
+    "#,
         file_name = file_name
     );
 
