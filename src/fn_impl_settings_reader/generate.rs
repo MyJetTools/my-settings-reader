@@ -14,15 +14,15 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let file_name = ".text";
 
     let implementation = format!(
-        r#"pub async fn load() -> Self {{
-        if let Some(result) = Self::read_from_file() {{
+        r#"pub async fn load(file_name: &str) -> Self {{
+        if let Some(result) = Self::read_from_file(file_name) {{
             return result;
         }}
     
         Self::read_from_url().await
     }}
     
-    fn read_from_file() -> Option<Self> {{
+    fn read_from_file(file_name: &str) -> Option<Self> {{
         let home = format!("{{}}/{file_name}", std::env::var("HOME").unwrap());
     
         let mut file_result = std::fs::File::open(home);
@@ -32,7 +32,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }}
     
         let mut result = Vec::new();
-        file_result.unwrap().read_to_end(&mut result).unwrap();
+        std::io::Read::read_to_end(&mut file_result.unwrap(), &mut result).unwrap();
         Some(serde_yaml::from_slice(&result).unwrap())
     }}
     
