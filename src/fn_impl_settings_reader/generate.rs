@@ -45,7 +45,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
         let url = url.unwrap();
     
-        let mut result = FlUrl::new(url.as_str()).get().await.unwrap();
+        let mut result = flurl::FlUrl::new(url.as_str()).get().await.unwrap();
     
         let body = result.get_body().await.unwrap();
     
