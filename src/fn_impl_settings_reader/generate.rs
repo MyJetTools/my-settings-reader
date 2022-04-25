@@ -11,8 +11,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("pub async fn read(&self) -> Self {");
-
     let file_name = ".text";
 
     let implementation = format!(
@@ -58,8 +56,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     );
 
     result.push_str(implementation.as_str());
-
-    result.push_str("}\n");
 
     result.push_str("}\n");
 
