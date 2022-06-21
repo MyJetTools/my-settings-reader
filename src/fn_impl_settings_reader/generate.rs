@@ -11,10 +11,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    let file_name = ".text";
-
-    let implementation = format!(
-        r#"pub async fn load(file_name: &str) -> Self {{
+    let implementation = r#"pub async fn load(file_name: &str) -> Self {{
         if let Some(result) = Self::read_from_file(file_name) {{
             return result;
         }}
@@ -23,7 +20,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     }}
     
     fn read_from_file(file_name: &str) -> Option<Self> {{
-        let home = format!("{{}}/{file_name}", std::env::var("HOME").unwrap());
+        let home = format!("{{}}/{{}}", std::env::var("HOME").unwrap(), file_name);
     
         let mut file_result = std::fs::File::open(home);
     
@@ -51,11 +48,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
         serde_yaml::from_slice(body).unwrap()
     }}
-    "#,
-        file_name = file_name
-    );
+    "#;
 
-    result.push_str(implementation.as_str());
+    result.push_str(implementation);
 
     result.push_str("}\n");
 
