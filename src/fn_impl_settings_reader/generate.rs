@@ -21,10 +21,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
     fn read_from_file(file_name: &str) -> Option<Self> {{
         let home = format!("{}/{}", std::env::var("HOME").unwrap(), file_name);
+
+
     
         let mut file_result = std::fs::File::open(home);
     
         if file_result.is_err() {{
+            println!("Can not read settings from file: {}", home);
             return None;
         }}
     
