@@ -24,7 +24,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
 
     
-        let mut file_result = std::fs::File::open(home);
+        let mut file_result = std::fs::File::open(home.as_str());
     
         if file_result.is_err() {{
             println!("Can not read settings from file: {}", home);
