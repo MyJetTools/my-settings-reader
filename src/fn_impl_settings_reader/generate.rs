@@ -21,10 +21,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
     fn read_from_file(file_name: &str) -> Option<Self> {{
         let home = format!("{}/{}", std::env::var("HOME").unwrap(), file_name);
+
+
     
-        let mut file_result = std::fs::File::open(home);
+        let mut file_result = std::fs::File::open(home.as_str());
     
         if file_result.is_err() {{
+            println!("Can not read settings from file: {}", home);
             return None;
         }}
     
@@ -42,7 +45,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
         let url = url.unwrap();
     
-        let mut result = flurl::FlUrl::new(url.as_str()).get().await.unwrap();
+        let mut result = flurl::FlUrl::new(url.as_str(), None).get().await.unwrap();
     
         let body = result.get_body().await.unwrap();
     
