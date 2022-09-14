@@ -55,7 +55,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     result.push_str("}\n");
 
-    #[cfg(feature = "settings-model-reader")]
+    #[cfg(feature = "background-reader")]
     {
         result.push_str(
             r#"

@@ -7,7 +7,7 @@ edition = "2021"
 
 [feautes]
 default = []
-settings-model-reader = []
+background-reader = []
 
 [lib]
 proc-macro = true
