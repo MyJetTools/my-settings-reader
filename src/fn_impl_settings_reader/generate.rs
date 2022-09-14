@@ -82,7 +82,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
             let settings = Arc::new(RwLock::new(settings));
     
-            tokio::spawn(update_settings_in_a_background(settings.clone()));
+            tokio::spawn(update_settings_in_a_background(settings.clone(),file_name.to_string(),));
     
             Self { settings }
         }
