@@ -89,7 +89,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
         pub async fn get_settings(&self) -> "#,
         );
-
+        result.push_str(struct_name.as_str());
         result.push_str(
             r#"{
             self.settings.read().await.clone()
@@ -98,7 +98,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     
     async fn update_settings_in_a_background(settings: Arc<RwLock<"#,
         );
-
+        result.push_str(struct_name.as_str());
         result.push_str(
             r#">>, file_name: String) {
         loop {
@@ -109,9 +109,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             let _ = tokio::spawn(async move {
                 let settings_model = "#,
         );
-
+        result.push_str(struct_name.as_str());
         result.push_str(
-            r#"::load(file_name).await;
+            r#"::load(file_name.as_str()).await;
                 let mut write_access = settings.write().await;
                 *write_access = settings_model;
             })
