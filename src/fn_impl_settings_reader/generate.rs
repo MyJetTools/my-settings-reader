@@ -61,7 +61,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             r#"
 
     pub struct SettingsReader {
-        settings: std::sync::Arc<RwLock<"#,
+        settings: std::sync::Arc<tokio::sync::RwLock<"#,
         );
 
         result.push_str(struct_name.as_str());
@@ -80,7 +80,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         result.push_str(
             r#"::load(file_name).await;
     
-            let settings = std::sync::Arc::new(RwLock::new(settings));
+            let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
     
             tokio::spawn(update_settings_in_a_background(settings.clone(),file_name.to_string(),));
     
@@ -96,7 +96,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     }
     
-    async fn update_settings_in_a_background(settings: std::sync::Arc<RwLock<"#,
+    async fn update_settings_in_a_background(settings: std::sync::Arc<tokio::sync::RwLock<"#,
         );
         result.push_str(struct_name.as_str());
         result.push_str(
