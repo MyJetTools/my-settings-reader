@@ -10,6 +10,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str("impl ");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
+
     result.push_str(
         r#"pub async fn load(file_name: &str) -> Self {{
         if let Some(result) = Self::read_from_file(file_name) {{
@@ -20,7 +21,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     }}
     
     fn read_from_file(file_name: &str) -> Option<Self> {{
-        let home = format!("{}/{}", std::env::var("HOME").unwrap(), file_name);
+        let home = format!("{}"#,
+    );
+
+    result.push(std::path::MAIN_SEPARATOR);
+
+    result.push_str(
+        r#"{}", std::env::var("HOME").unwrap(), file_name);
 
 
     
