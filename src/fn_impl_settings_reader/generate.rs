@@ -24,7 +24,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         let home = format!("{}"#,
     );
 
-    result.push(std::path::MAIN_SEPARATOR);
+    if std::path::MAIN_SEPARATOR == '/' {
+        result.push(std::path::MAIN_SEPARATOR);
+    } else {
+        result.push(std::path::MAIN_SEPARATOR);
+        result.push(std::path::MAIN_SEPARATOR);
+    }
 
     result.push_str(
         r#"{}", std::env::var("HOME").unwrap(), file_name);
