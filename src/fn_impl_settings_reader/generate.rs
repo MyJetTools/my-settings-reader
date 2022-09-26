@@ -23,8 +23,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             Self::read_from_url().await
         }
     
-    async fn read_from_file(file_name: &str) -> Option<Self> {
-        let home = format!("{}"#,
+    async fn read_from_file(file_name: String) -> Option<Self> {
+        let file_name = format!("{}"#,
     );
 
     if std::path::MAIN_SEPARATOR == '/' {
