@@ -23,7 +23,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             Self::read_from_url().await
         }
     
-    async fn read_from_file(file_name: String) -> Option<Self> {
+    async fn read_from_file(file_name: String) -> Result<Self, String> {
         let file_name = format!("{}"#,
     );
 
