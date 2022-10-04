@@ -60,7 +60,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     panic!("Environmant variable SETTINGS_URL is not set");
             }
             let url = url.unwrap();
-            let mut result = flurl::FlUrl::new(url.as_str(), None).get().await.unwrap();
+            let mut result = flurl::FlUrl::new(url.as_str()).get().await.unwrap();
             let body = result.get_body().await.unwrap();
             serde_yaml::from_slice(body).unwrap()
     }"#,
