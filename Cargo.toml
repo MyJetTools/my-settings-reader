@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["background-reader"]
+default = []
 background-reader = []
 
 [lib]
@@ -15,3 +15,4 @@ proc-macro = true
 [dependencies]
 syn = { version = "*", features = ["extra-traits"] }
 quote = "*"
+proc-macro2 = "*"
