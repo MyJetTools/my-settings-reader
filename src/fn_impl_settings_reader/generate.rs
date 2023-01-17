@@ -81,7 +81,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 match Self::read_from_file(file_name.to_string()).await {
                     Ok(settings) => return settings,
                     Err(err) => {
-                        println!(err);
+                        println!("{}", err);
                     }
                 }
                 Self::read_from_url().await
