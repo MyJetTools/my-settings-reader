@@ -84,6 +84,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     }.into();
 
     quote::quote! {
+        pub enum LoadSettingsError{
+            FileError(String),
+            YamlError(String)
+        }
+
         impl #struct_name {
             pub async fn load(file_name: &str) -> Self {
                 match Self::read_from_file(file_name.to_string()).await {
@@ -94,22 +99,22 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 }
                 Self::read_from_url().await
             }
-            async fn read_from_file(file_name: String) -> Result<Self, String> {
+            async fn read_from_file(file_name: String) -> Result<Self, LoadSettingsError> {
                 let file_name = format!(#main_separator, std::env::var("HOME").unwrap(), file_name);
                 let file_result = tokio::fs::File::open(file_name.as_str()).await;
                 if file_result.is_err() {
-                    return Err(format!("Can not read settings from file: {}", file_name));
+                    return Err(LoadSettingsError::FileError(format!("Can not read settings from file: {}", file_name)));
                 }
                 let mut result = Vec::new();
                 match tokio::io::AsyncReadExt::read_to_end(&mut file_result.unwrap(), &mut result).await {
                     Ok(_) => match serde_yaml::from_slice(&result) {
                         Ok(result) => Ok(result),
-                        Err(err) => Err(format!(
+                        Err(err) => Err(LoadSettingsError::YamlError(format!(
                             "Invalid yaml format of file: {}. Err: {}",
                             file_name, err
-                        )),
+                        ))),
                     },
-                    Err(_) => Err(format!("Can not read settings from file: {}", file_name)),
+                    Err(_) => Err(LoadSettingsError::FileError(format!("Can not read settings from file: {}", file_name))),
                 }
             }
             async fn read_from_url() -> Self {
