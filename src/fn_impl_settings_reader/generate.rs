@@ -27,14 +27,22 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
         impl SettingsReader {
             pub async fn new(file_name: &str) -> Self {
-                if let Ok(settings) = #struct_name::read_from_file(file_name.to_string()).await {
-                    let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
-                    tokio::spawn(update_settings_in_a_background(
-                        settings.clone(),
-                        Some(file_name.to_string()),
-                    ));
-                    return Self { settings };
+
+
+                match #struct_name::read_from_file(file_name.to_string()).await{
+                    Ok(settings)=>{
+                        let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
+                        tokio::spawn(update_settings_in_a_background(
+                            settings.clone(),
+                            Some(file_name.to_string()),
+                        ));
+                        return Self { settings };
+                    }
+                    Err(err)=>{
+                        println!("Can not load settings from file. {:?}", err);
+                    }
                 }
+          
                 let settings = #struct_name::read_from_url().await;
                 let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
                 tokio::spawn(update_settings_in_a_background(settings.clone(), None));
@@ -107,7 +115,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             async fn read_from_url() -> Self {
                 let url = std::env::var("SETTINGS_URL");
                 if url.is_err() {
-                    panic!("Environmant variable SETTINGS_URL is not set");
+                    panic!("Environment variable SETTINGS_URL is not set");
                 }
                 let url = url.unwrap();
                 let mut result = flurl::FlUrl::new(url.as_str()).get().await.unwrap();
