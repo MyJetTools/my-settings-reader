@@ -84,6 +84,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     }.into();
 
     quote::quote! {
+        #[derive(Debug, Clone)]
         pub enum LoadSettingsError{
             FileError(String),
             YamlError(String)
