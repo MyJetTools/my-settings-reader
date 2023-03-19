@@ -99,6 +99,15 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             FromUrl(#struct_name),
         }
 
+        impl Into<#struct_name> for FirstLoadResult{
+            fn into(self) -> #struct_name {
+                match self {
+                    FirstLoadResult::FromFile(settings) => settings,
+                    FirstLoadResult::FromUrl(settings) => settings,
+                }
+            }
+        } 
+
         impl #struct_name {
             pub async fn first_load(file_name: &str) -> FirstLoadResult {
                 match Self::read_from_file(file_name.to_string()).await {
