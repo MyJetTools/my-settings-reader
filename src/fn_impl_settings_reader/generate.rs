@@ -95,8 +95,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
 
         pub enum FirstLoadResult {
-            FromFile(SettingsModel),
-            FromUrl(SettingsModel),
+            FromFile(#struct_name),
+            FromUrl(#struct_name),
         }
 
         impl #struct_name {
