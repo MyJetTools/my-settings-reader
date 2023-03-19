@@ -27,10 +27,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
         impl SettingsReader {
             pub async fn new(file_name: &str) -> Self {
-
-
-                match #struct_name::read_from_file(file_name.to_string()).await{
-                    Ok(settings)=>{
+                match #struct_name::read_from_file(file_name.to_string()).await {
+                    Ok(settings) => {
                         let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
                         tokio::spawn(update_settings_in_a_background(
                             settings.clone(),
@@ -38,12 +36,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                         ));
                         return Self { settings };
                     }
-                    Err(err)=>{
+                    Err(err) => {
                         println!("Can not load settings from file. {:?}", err);
                     }
                 }
-          
-                let settings = #struct_name::read_from_url().await;
+                let settings = #struct_name::read_from_url().await.unwrap();
                 let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
                 tokio::spawn(update_settings_in_a_background(settings.clone(), None));
                 Self { settings }
@@ -60,25 +57,34 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 tokio::time::sleep(std::time::Duration::from_secs(60)).await;
                 let settings = settings.clone();
                 let file_name = file_name.clone();
-                let _ = tokio::spawn(async move {
-                    let result = if let Some(file_name) = &file_name {
-                        let file_name = file_name.clone();
-                        match tokio::spawn(#struct_name::read_from_file(file_name)).await {
-                            Ok(result) => result,
-                            Err(err) => Err(format!("Can not read settings from file. Err: {}", err)),
+        
+                if let Some(file_name) = &file_name {
+                    let file_name = file_name.clone();
+        
+                    tokio::spawn(async move {
+                        match #struct_name::read_from_file(file_name).await {
+                            Ok(settings_model) => {
+                                let mut write_access = settings.write().await;
+                                *write_access = settings_model;
+                            }
+                            Err(err) => {
+                                println!("Can not read settings from file. Err: {:?}", err);
+                            }
                         }
-                    } else {
-                        match tokio::spawn(#struct_name::read_from_url()).await {
-                            Ok(result) => Ok(result),
-                            Err(err) => Err(format!("Can not read settings from url. Err: {}", err)),
+                    });
+                } else {
+                    tokio::spawn(async move {
+                        match #struct_name::read_from_url().await {
+                            Ok(settings_model) => {
+                                let mut write_access = settings.write().await;
+                                *write_access = settings_model;
+                            }
+                            Err(err) => {
+                                println!("Can not read settings from url. Err: {:?}", err);
+                            }
                         }
-                    };
-                    if let Ok(settings_model) = result {
-                        let mut write_access = settings.write().await;
-                        *write_access = settings_model;
-                    }
-                })
-                .await;
+                    });
+                }
             }
         }
     }.into();
@@ -95,7 +101,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 match Self::read_from_file(file_name.to_string()).await {
                     Ok(settings) => return settings,
                     Err(err) => {
-                        println!("{}", err);
+                        println!("{:?}", err);
                     }
                 }
                 Self::read_from_url().await
@@ -118,15 +124,41 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     Err(_) => Err(LoadSettingsError::FileError(format!("Can not read settings from file: {}", file_name))),
                 }
             }
-            async fn read_from_url() -> Self {
+            async fn read_from_url() -> Result<Self, String> {
                 let url = std::env::var("SETTINGS_URL");
                 if url.is_err() {
-                    panic!("Environment variable SETTINGS_URL is not set");
+                    return Err(format!("Environment variable SETTINGS_URL is not set"));
                 }
                 let url = url.unwrap();
-                let mut result = flurl::FlUrl::new(url.as_str()).get().await.unwrap();
-                let body = result.get_body().await.unwrap();
-                serde_yaml::from_slice(body).unwrap()
+                let result = flurl::FlUrl::new(url.as_str()).get().await;
+        
+                if let Err(err) = &result {
+                    return Err(format!(
+                        "Can not read settings from url: {}. Err: {:?}",
+                        url, err
+                    ));
+                }
+        
+                let mut result = result.unwrap();
+        
+                let body = result.get_body().await;
+        
+                if let Err(err) = &body {
+                    return Err(format!(
+                        "Can not extract body from http request settings from url: {}. Err: {:?}",
+                        url, err
+                    ));
+                }
+        
+                let body = body.unwrap();
+        
+                match serde_yaml::from_slice(body) {
+                    Ok(result) => Ok(result),
+                    Err(err) => Err(format!(
+                        "Invalid yaml format of file: {}. Err: {}",
+                        url, err
+                    )),
+                }
             }
         }
 
