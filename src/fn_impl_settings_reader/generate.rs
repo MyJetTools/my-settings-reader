@@ -27,23 +27,21 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
         impl SettingsReader {
             pub async fn new(file_name: &str) -> Self {
-                match #struct_name::read_from_file(file_name.to_string()).await {
-                    Ok(settings) => {
+                match #struct_name::first_load(file_name).await {
+                    FirstLoadResult::FromFile(settings) => {
                         let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
                         tokio::spawn(update_settings_in_a_background(
                             settings.clone(),
                             Some(file_name.to_string()),
                         ));
-                        return Self { settings };
+                        Self { settings }
                     }
-                    Err(err) => {
-                        println!("Can not load settings from file. {:?}", err);
+                    FirstLoadResult::FromUrl(settings) => {
+                        let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
+                        tokio::spawn(update_settings_in_a_background(settings.clone(), None));
+                        Self { settings }
                     }
                 }
-                let settings = #struct_name::read_from_url().await.unwrap();
-                let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
-                tokio::spawn(update_settings_in_a_background(settings.clone(), None));
-                Self { settings }
             }
             pub async fn get_settings(&self) -> #struct_name {
                 self.settings.read().await.clone()
@@ -96,15 +94,30 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             YamlError(String)
         }
 
+        pub enum FirstLoadResult {
+            FromFile(SettingsModel),
+            FromUrl(SettingsModel),
+        }
+
         impl #struct_name {
-            pub async fn load(file_name: &str) -> Self {
+            pub async fn first_load(file_name: &str) -> FirstLoadResult {
                 match Self::read_from_file(file_name.to_string()).await {
-                    Ok(settings) => return settings,
+                    Ok(settings) => return FirstLoadResult::FromFile(settings),
                     Err(err) => {
-                        println!("{:?}", err);
+                        match err {
+                            LoadSettingsError::FileError(err) => {
+                                println!("Can not load settings from file. {:?}", err);
+
+                            }
+                            LoadSettingsError::YamlError(err) => {
+                                panic!("{}", err);
+                            }
+                        }
+            
                     }
                 }
-                Self::read_from_url().await
+                let result = Self::read_from_url().await.unwrap();
+                FirstLoadResult::FromUrl(result)
             }
             async fn read_from_file(file_name: String) -> Result<Self, LoadSettingsError> {
                 let file_name = format!(#main_separator, std::env::var("HOME").unwrap(), file_name);
