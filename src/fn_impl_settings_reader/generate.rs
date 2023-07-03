@@ -101,8 +101,10 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
         impl FirstLoadResult{
             pub fn unwrap(self)->#struct_name{
-                settings::FirstLoadResult::FromFile(result) => result,
-                settings::FirstLoadResult::FromUrl(result) => result,
+                match self{
+                    Self::FromFile(result) => result,
+                    Self::FromUrl(result) => result,
+                }
             }
         }
 
