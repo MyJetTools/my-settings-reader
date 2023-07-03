@@ -99,6 +99,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             FromUrl(#struct_name),
         }
 
+        impl FirstLoadResult{
+            pub fn unwrap(self)->#struct_name{
+                settings::FirstLoadResult::FromFile(result) => result,
+                settings::FirstLoadResult::FromUrl(result) => result,
+            }
+        }
+
         impl Into<#struct_name> for FirstLoadResult{
             fn into(self) -> #struct_name {
                 match self {
@@ -128,7 +135,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 let result = Self::read_from_url().await.unwrap();
                 FirstLoadResult::FromUrl(result)
             }
-            async fn read_from_file(file_name: String) -> Result<Self, LoadSettingsError> {
+            pub async fn read_from_file(file_name: String) -> Result<Self, LoadSettingsError> {
                 let file_name = format!(#main_separator, std::env::var("HOME").unwrap(), file_name);
                 let file_result = tokio::fs::File::open(file_name.as_str()).await;
                 if file_result.is_err() {
