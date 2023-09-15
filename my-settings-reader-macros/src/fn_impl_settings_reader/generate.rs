@@ -145,7 +145,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 }
                 let mut result = Vec::new();
                 match tokio::io::AsyncReadExt::read_to_end(&mut file_result.unwrap(), &mut result).await {
-                    Ok(_) => match serde_yaml::from_slice(&result) {
+                    Ok(_) => match my_settings_reader::serde_yaml::from_slice(&result) {
                         Ok(result) => Ok(result),
                         Err(err) => Err(LoadSettingsError::YamlError(format!(
                             "Invalid yaml format of file: {}. Err: {}",
@@ -161,7 +161,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     return Err(format!("Environment variable SETTINGS_URL is not set"));
                 }
                 let url = url.unwrap();
-                let result = flurl::FlUrl::new(url.as_str()).get().await;
+                let result = my_settings_reader::flurl::FlUrl::new(url.as_str()).get().await;
         
                 if let Err(err) = &result {
                     return Err(format!(
@@ -183,7 +183,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         
                 let body = body.unwrap();
         
-                match serde_yaml::from_slice(body) {
+                match my_settings_reader::serde_yaml::from_slice(body) {
                     Ok(result) => Ok(result),
                     Err(err) => Err(format!(
                         "Invalid yaml format of file: {}. Err: {}",

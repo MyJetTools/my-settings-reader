@@ -1,0 +1,19 @@
+[package]
+name = "my-settings-reader-macros"
+version = "0.1.5"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = []
+background-reader = []
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "*", features = ["extra-traits"] }
+quote = "*"
+proc-macro2 = "*"
+flurl = {tag = "0.4.0", git = "https://github.com/MyJetTools/fl-url.git"}
