@@ -9,5 +9,5 @@ background-reader = ["my-settings-reader-macros/background-reader"]
 
 [dependencies]
 my-settings-reader-macros = { path = "../my-settings-reader-macros" }
-flurl = {version = "0.4.0", git = "https://github.com/MyJetTools/fl-url.git"}
+flurl = { version = "0.4.1", git = "https://github.com/MyJetTools/fl-url.git" }
 serde_yaml = "*"
