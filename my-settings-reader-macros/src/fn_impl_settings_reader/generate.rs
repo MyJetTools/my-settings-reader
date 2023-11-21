@@ -172,7 +172,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         
                 let mut result = result.unwrap();
         
-                let body = result.get_body().await;
+                let body = result.get_body_as_slice().await;
         
                 if let Err(err) = &body {
                     return Err(format!(
