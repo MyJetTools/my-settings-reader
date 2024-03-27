@@ -45,7 +45,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             }
 
             pub async fn default() -> Self {
-                SettingsReader::new_with_file_name(".settings").await
+                SettingsReader::new(".settings").await
             }
 
 
