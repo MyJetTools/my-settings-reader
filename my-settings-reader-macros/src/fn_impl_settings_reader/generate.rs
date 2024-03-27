@@ -26,7 +26,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             settings: std::sync::Arc<tokio::sync::RwLock<#struct_name>>,
         }
         impl SettingsReader {
-            pub async fn new_with_file_name(file_name: &str) -> Self {
+            pub async fn new(file_name: &str) -> Self {
                 match #struct_name::first_load(file_name).await {
                     FirstLoadResult::FromFile(settings) => {
                         let settings = std::sync::Arc::new(tokio::sync::RwLock::new(settings));
@@ -44,8 +44,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 }
             }
 
-            pub async fn new() -> Self {
-                SettingsReader::new_with_file_name("settings.yaml").await
+            pub async fn default() -> Self {
+                SettingsReader::new_with_file_name(".settings").await
             }
 
 
