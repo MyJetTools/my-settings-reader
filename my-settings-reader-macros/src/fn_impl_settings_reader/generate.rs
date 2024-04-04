@@ -124,6 +124,27 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         } 
 
         impl #struct_name {
+
+            pub async fn load(file_name: &str) -> Result<Self, String> {
+                match Self::read_from_file(file_name.to_string()).await {
+                    Ok(settings) => return Ok(settings),
+                    Err(err) => {
+                        match err {
+                            LoadSettingsError::FileError(err) => {
+                                println!("Can not load settings from file. {:?}", err);
+
+                            }
+                            LoadSettingsError::YamlError(err) => {
+                                return Err(err);
+                            }
+                        }
+            
+                    }
+                }
+                
+                Self::read_from_url().await
+            }
+
             pub async fn first_load(file_name: &str) -> FirstLoadResult {
                 match Self::read_from_file(file_name.to_string()).await {
                     Ok(settings) => return FirstLoadResult::FromFile(settings),
