@@ -12,10 +12,10 @@ impl<T> SettingsReader<T>
 where
     T: serde::de::DeserializeOwned,
 {
-    pub fn new(file_name: StrOrString<'static>) -> Self {
+    pub fn new(file_name: impl Into<StrOrString<'static>>) -> Self {
         Self {
             settings: tokio::sync::Mutex::new(None),
-            file_name,
+            file_name: file_name.into(),
         }
     }
 

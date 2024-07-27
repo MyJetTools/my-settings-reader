@@ -1,2 +1,2 @@
 [workspace]
-members = ["my-settings-reader", "my-settings-reader-macros", "utils"]
+members = ["my-settings-reader", "my-settings-reader-macros"]
