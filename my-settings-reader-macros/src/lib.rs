@@ -10,8 +10,8 @@ pub fn settings_model(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
-pub fn render_settings_reader(_input: TokenStream) -> TokenStream {
-    let file_name = _input.to_string();
+pub fn render_settings_reader(input: TokenStream) -> TokenStream {
+    let file_name: proc_macro2::TokenStream = input.into();
     let result = quote::quote! {
         pub struct SettingsReader {
             settings: tokio::sync::Mutex<Option<std::sync::Arc<SettingsModel>>>,
