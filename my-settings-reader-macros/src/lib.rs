@@ -14,17 +14,17 @@ pub fn dioxus_settings_reader(_input: TokenStream) -> TokenStream {
     let file_name = _input.to_string();
     let result = quote::quote! {
         pub struct SettingsReader {
-            settings: Mutex<Option<Arc<SettingsModel>>>,
+            settings: tokio::sync::Mutex<Option<std::sync::Arc<SettingsModel>>>,
         }
 
         impl SettingsReader {
             pub fn new() -> Self {
                 Self {
-                    settings: Mutex::new(None),
+                    settings: tokio::sync::Mutex::new(None),
                 }
             }
 
-            pub async fn get_settings(&self) -> Arc<SettingsModel> {
+            pub async fn get_settings(&self) -> std::sync::Arc<SettingsModel> {
                 let mut settings_access = self.settings.lock().await;
 
                 loop {
@@ -48,7 +48,7 @@ pub fn dioxus_settings_reader(_input: TokenStream) -> TokenStream {
 
                     let model: SettingsModel = serde_yaml::from_str(content.as_str()).unwrap();
 
-                    let model = Arc::new(model);
+                    let model = std::sync::Arc::new(model);
 
                     *settings_access = Some(model);
                 }
