@@ -10,7 +10,7 @@ pub fn settings_model(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
-pub fn dioxus_settings_reader(_input: TokenStream) -> TokenStream {
+pub fn render_settings_reader(_input: TokenStream) -> TokenStream {
     let file_name = _input.to_string();
     let result = quote::quote! {
         pub struct SettingsReader {
