@@ -1,6 +1,6 @@
 use rust_extensions::StrOrString;
 
-pub struct SettingsReader<T>
+pub struct SettingsReader<T: Send + Sync + 'static>
 where
     T: serde::de::DeserializeOwned,
 {
@@ -8,7 +8,7 @@ where
     file_name: StrOrString<'static>,
 }
 
-impl<T> SettingsReader<T>
+impl<T: Send + Sync + 'static> SettingsReader<T>
 where
     T: serde::de::DeserializeOwned,
 {
