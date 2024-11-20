@@ -1,6 +1,6 @@
 [package]
 name = "my-settings-reader"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,8 +9,8 @@ background-reader = ["my-settings-reader-macros/background-reader"]
 
 [dependencies]
 my-settings-reader-macros = { path = "../my-settings-reader-macros" }
-flurl = { tag = "0.6.0", git = "https://github.com/MyJetTools/fl-url.git" }
+flurl = { tag = "0.6.1", git = "https://github.com/MyJetTools/fl-url.git" }
 serde_yaml = "*"
 tokio = { version = "*" }
-rust-extensions = { tag = "0.1.4", git = "https://github.com/MyJetTools/rust-extensions.git" }
+rust-extensions = { tag = "0.1.5", git = "https://github.com/MyJetTools/rust-extensions.git" }
 serde = "*"
