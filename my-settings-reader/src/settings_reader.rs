@@ -19,6 +19,26 @@ where
         }
     }
 
+    async fn read_settings_model(&self) -> std::sync::Arc<T> {
+        let file_name = rust_extensions::file_utils::format_path(self.file_name.as_str());
+
+        let content = tokio::fs::read_to_string(file_name.as_str()).await;
+
+        if let Err(err) = &content {
+            panic!(
+                "Can not read settings file '{}'. Err:{}",
+                file_name.as_str(),
+                err
+            );
+        }
+
+        let content = content.unwrap();
+
+        let model: T = serde_yaml::from_str(content.as_str()).unwrap();
+
+        std::sync::Arc::new(model)
+    }
+
     pub async fn get_settings(&self) -> std::sync::Arc<T> {
         let mut settings_access = self.settings.lock().await;
 
@@ -27,24 +47,20 @@ where
                 return settings_access;
             }
 
-            let file_name = rust_extensions::file_utils::format_path(self.file_name.as_str());
+            let model = self.read_settings_model().await;
+            *settings_access = Some(model);
+        }
+    }
 
-            let content = tokio::fs::read_to_string(file_name.as_str()).await;
+    pub async fn get<TResult>(&self, convert: impl Fn(&T) -> TResult) -> TResult {
+        let mut settings_access = self.settings.lock().await;
 
-            if let Err(err) = &content {
-                panic!(
-                    "Can not read settings file '{}'. Err:{}",
-                    file_name.as_str(),
-                    err
-                );
+        loop {
+            if let Some(settings_access) = settings_access.as_ref() {
+                return convert(settings_access);
             }
 
-            let content = content.unwrap();
-
-            let model: T = serde_yaml::from_str(content.as_str()).unwrap();
-
-            let model = std::sync::Arc::new(model);
-
+            let model = self.read_settings_model().await;
             *settings_access = Some(model);
         }
     }
