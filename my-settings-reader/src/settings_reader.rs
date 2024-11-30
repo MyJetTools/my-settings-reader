@@ -111,6 +111,19 @@ where
         }
     }
 
+    pub async fn get_settings(&self) -> Arc<T> {
+        let mut settings_access = self.inner.instance.lock().await;
+
+        loop {
+            if let Some(settings_access) = settings_access.as_ref() {
+                return settings_access.clone();
+            }
+
+            let model = self.inner.read_settings_model().await.unwrap();
+            *settings_access = Some(model);
+        }
+    }
+
     pub async fn get<TResult>(&self, convert: impl Fn(&T) -> TResult) -> TResult {
         let mut settings_access = self.inner.instance.lock().await;
 
