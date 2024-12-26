@@ -72,7 +72,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                                 *write_access = settings_model;
                             }
                             Err(err) => {
-                                println!("Can not read settings from file. Err: {:?}", err);
+                                eprintln!("Can not read settings from file. Err: {:?}", err);
                             }
                         }
                     });
@@ -84,7 +84,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                                 *write_access = settings_model;
                             }
                             Err(err) => {
-                                println!("Can not read settings from url. Err: {:?}", err);
+                                eprintln!("Can not read settings from url. Err: {:?}", err);
                             }
                         }
                     });
@@ -131,7 +131,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     Err(err) => {
                         match err {
                             LoadSettingsError::FileError(err) => {
-                                println!("Can not load settings from file. {:?}", err);
+                                eprintln!("Can not load settings from file. {:?}", err);
 
                             }
                             LoadSettingsError::YamlError(err) => {
@@ -151,7 +151,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     Err(err) => {
                         match err {
                             LoadSettingsError::FileError(err) => {
-                                println!("Can not load settings from file. {:?}", err);
+                                eprintln!("Can not load settings from file. {:?}", err);
 
                             }
                             LoadSettingsError::YamlError(err) => {

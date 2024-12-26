@@ -31,7 +31,7 @@ where
         let response = match FlUrl::new(url.as_str()).get().await {
             Ok(response) => response,
             Err(err) => {
-                println!("Can not read settings from url {}. Err: {:?}", url, err);
+                eprintln!("Can not read settings from url {}. Err: {:?}", url, err);
                 return None;
             }
         };
@@ -41,7 +41,7 @@ where
         let content = match content {
             Ok(content) => content,
             Err(err) => {
-                println!("Can not get settings body from url {}. Err: {:?}", url, err);
+                eprintln!("Can not get settings body from url {}. Err: {:?}", url, err);
                 return None;
             }
         };
@@ -49,7 +49,7 @@ where
         match serde_yaml::from_slice(content.as_slice()) {
             Ok(settings) => Some(settings),
             Err(err) => {
-                println!(
+                eprintln!(
                     "Can not deserialize settings from url {}. Err: {:?}",
                     url, err
                 );
@@ -151,7 +151,7 @@ where
                 *write_access = Some(settings_model);
             }
             Err(err) => {
-                println!("Error reading settings from file. Err: {:?}", err);
+                eprintln!("Error reading settings from file. Err: {:?}", err);
             }
         }
     }
