@@ -173,7 +173,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 FirstLoadResult::FromUrl(result)
             }
             pub async fn read_from_file(file_name: String) -> Result<Self, LoadSettingsError> {
-                let file_name = format!(#main_separator, std::env::var("HOME").unwrap(), file_name);
+                let file_name = if file_name.starts_with('~') {
+                  format!("{}{}", std::env::var("HOME").unwrap(), &file_name[1..])
+                } else {
+                  file_name
+                };
+
                 let file_result = tokio::fs::File::open(file_name.as_str()).await;
                 if file_result.is_err() {
                     return Err(LoadSettingsError::FileError(format!("Can not read settings from file: {}", file_name)));
