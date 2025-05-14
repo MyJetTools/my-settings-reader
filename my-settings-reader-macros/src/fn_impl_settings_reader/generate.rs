@@ -52,6 +52,14 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             pub async fn get_settings(&self) -> #struct_name {
                 self.settings.read().await.clone()
             }
+
+            pub async fn use_settings<TResult>(
+              &self,
+              callback: impl Fn(&SettingsModel) -> TResult,
+            ) -> TResult {
+                 let read_access = self.settings.read().await;
+                 callback(&read_access)
+            }
         }
         async fn update_settings_in_a_background(
             settings: std::sync::Arc<tokio::sync::RwLock<#struct_name>>,
