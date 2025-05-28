@@ -55,7 +55,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
             pub async fn use_settings<TResult>(
               &self,
-              callback: impl Fn(&SettingsModel) -> TResult,
+              callback: impl Fn(&#struct_name) -> TResult,
             ) -> TResult {
                  let read_access = self.settings.read().await;
                  callback(&read_access)
