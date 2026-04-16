@@ -201,7 +201,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     return Err(format!("Environment variable SETTINGS_URL is not set"));
                 }
                 let url = url.unwrap();
-                let result = my_settings_reader::flurl::FlUrl::new(url.as_str()).get().await;
+                let mut fl_url = my_settings_reader::flurl::FlUrl::new(url.as_str());
+                if let Ok(env_info) = std::env::var("ENV_INFO") {
+                    fl_url = fl_url.with_header("env-info", env_info);
+                }
+                let result = fl_url.get().await;
         
                 if let Err(err) = &result {
                     return Err(format!(
