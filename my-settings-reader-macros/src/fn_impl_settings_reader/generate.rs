@@ -173,8 +173,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 FirstLoadResult::FromUrl(result)
             }
             pub async fn read_from_file(file_name: String) -> Result<Self, LoadSettingsError> {
-                let file_name = if file_name.starts_with('~') {
-                  format!("{}{}", std::env::var("HOME").unwrap(), &file_name[1..])
+                let file_name = if let Some(rest) = file_name.strip_prefix('~') {
+                  format!("{}{}", std::env::var("HOME").unwrap(), rest)
                 } else {
                   file_name
                 };
