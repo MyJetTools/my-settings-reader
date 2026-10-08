@@ -3,6 +3,8 @@ use std::sync::Arc;
 use flurl::FlUrl;
 use rust_extensions::StrOrString;
 
+pub const MAX_SETTINGS_BODY_SIZE: usize = 1024 * 1024;
+
 pub struct SettingsReaderInner<T: Send + Sync + 'static>
 where
     T: serde::de::DeserializeOwned,
@@ -32,7 +34,7 @@ where
         if let Ok(env_info) = std::env::var("ENV_INFO") {
             fl_url = fl_url.with_header("env-info", env_info);
         }
-        let response = match fl_url.get().await {
+        let mut response = match fl_url.get().await {
             Ok(response) => response,
             Err(err) => {
                 eprintln!("Can not read settings from url {}. Err: {:?}", url, err);
@@ -40,7 +42,10 @@ where
             }
         };
 
-        let content = response.receive_body().await;
+        let content = match response.get_body() {
+            Ok(body) => body.into_vec(MAX_SETTINGS_BODY_SIZE).await,
+            Err(err) => Err(err),
+        };
 
         let content = match content {
             Ok(content) => content,

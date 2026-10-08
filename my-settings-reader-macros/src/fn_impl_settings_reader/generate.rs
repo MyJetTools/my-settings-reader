@@ -216,7 +216,10 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         
                 let mut result = result.unwrap();
         
-                let body = result.get_body_as_slice().await;
+                let body = match result.get_body() {
+                    Ok(body) => body.into_vec(my_settings_reader::MAX_SETTINGS_BODY_SIZE).await,
+                    Err(err) => Err(err),
+                };
         
                 if let Err(err) = &body {
                     return Err(format!(
@@ -227,7 +230,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         
                 let body = body.unwrap();
         
-                match my_settings_reader::serde_yaml::from_slice(body) {
+                match my_settings_reader::serde_yaml::from_slice(body.as_slice()) {
                     Ok(result) => Ok(result),
                     Err(err) => Err(format!(
                         "Invalid yaml format of file: {}. Err: {}",
